@@ -8,7 +8,7 @@ dotenv.config();
 export interface ExtendedRequest extends Request {
   info?: TokenInfo;
 }
-const verifyToken = (req: ExtendedRequest, res: Response, next: NextFunction) => {
+export const verifyToken = (req: ExtendedRequest, res: Response, next: NextFunction) => {
   try {
     let authHeaders = req.headers['authorization'] as string;
 
@@ -45,7 +45,7 @@ const verifyToken = (req: ExtendedRequest, res: Response, next: NextFunction) =>
   }
 }
 
-const getUserIdFromToken = (req: ExtendedRequest, res: Response):string => {
+export const getUserIdFromToken = (req: ExtendedRequest):string => {
   let data = req.info as TokenInfo;
 
   if (!data) {

@@ -80,7 +80,7 @@ export class UserService {
   }
 
   async getAllUsers() {
-    let result = (await Helpers.query('select * from users where isDeleted = 0')).recordset as User[];
+    let result = (await Helpers.query("select * from users where isDeleted = 0 and role != 'admin'")).recordset as User[];
 
     if (lodash.isEmpty(result)) {
       return {
@@ -169,7 +169,7 @@ export class UserService {
   }
 
   async getUserByName(fullname: string) {
-    let result = (await Helpers.query(`select * from users where fullname = '${fullname}'`)).recordset as User[];
+    let result = (await Helpers.query(`select * from users where fullname = '${fullname}' and isDeleted = 0 and role != 'admin'`)).recordset as User[];
 
     if (lodash.isEmpty(result)) {
       return {
@@ -184,7 +184,7 @@ export class UserService {
   }
 
   async getUserByEmail(email: string) {
-    let result = (await Helpers.query(`select * from users where email = '${email}'`)).recordset as User[];
+    let result = (await Helpers.query(`select * from users where email = '${email}' and role != 'admin`)).recordset as User[];
 
     if (lodash.isEmpty(result)) {
       return {

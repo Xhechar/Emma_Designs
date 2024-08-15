@@ -1,5 +1,5 @@
 import { Helpers } from "../db_helper/db_helper";
-import { Product } from "../interfaces/fashion.interfaces"; 
+import { Cartegorie, Cartegory, Name, Product } from "../interfaces/fashion.interfaces"; 
 import { v4 } from 'uuid';
 import mssql from 'mssql';
 import { sqlConfig } from "../config/config";
@@ -84,8 +84,8 @@ export class ProductService {
     }
   }
 
-  async getProductByName(name: string) {
-    let productExists = (await Helpers.query(`select * from products where name = '${name}'`)).recordset as Product[];
+  async getProductByName(name: Name) {
+    let productExists = (await Helpers.query(`select * from products where name = '${name.name}'`)).recordset as Product[];
 
     if (lodash.isEmpty(productExists)) {
       return {
@@ -99,8 +99,8 @@ export class ProductService {
     }
   }
 
-  async getProductByCartegory(cartegory: string) {
-    let productExists = (await Helpers.query(`select * from products where cartegory = '${cartegory}'`)).recordset as Product[];
+  async getProductByCartegory(cartegory: Cartegorie) {
+    let productExists = (await Helpers.query(`select * from products where cartegory = '${cartegory.cartegory}'`)).recordset as Product[];
 
     if (lodash.isEmpty(productExists)) {
       return {
@@ -116,6 +116,21 @@ export class ProductService {
 
   async getAllProduct() {
     let result = (await Helpers.query(`select * from products`)).recordset as Product[];
+
+    if (lodash.isEmpty(result)) {
+      return {
+        error: 'There are no products currently available'
+      }
+    } else {
+      return {
+        message: 'Product(s) successfully retrieved',
+        product: result
+      }
+    }
+  }
+
+  async getFlushProducts() {
+    let result = (await Helpers.query(`select * from products where onFlush = 1`)).recordset as Product[];
 
     if (lodash.isEmpty(result)) {
       return {

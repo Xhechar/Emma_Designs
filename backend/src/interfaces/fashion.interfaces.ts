@@ -110,3 +110,11 @@ export interface TokenInfo {
   role: string,
   createdAt: string,
 }
+
+export interface Name {
+  name: string
+}
+
+export interface Cartegorie {
+  cartegory: string
+}

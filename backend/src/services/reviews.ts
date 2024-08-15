@@ -217,7 +217,7 @@ export class ReviewService {
     }
   }
 
-  async getReviewsByRating(rating: number) {
+  async getReviewsByRating(rating: string) {
     let reviews: Review[] = [];
     let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type from reviews r join products p on r.product_id = p.product_id where r.rating = '${rating}'`)).recordset;
 
