@@ -1,5 +1,5 @@
 import lodash, { rest } from 'lodash';
-import { User } from '../interfaces/fashion.interfaces';
+import { Email, Fullname, User } from '../interfaces/fashion.interfaces';
 import { Helpers } from '../db_helper/db_helper';
 import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
@@ -48,7 +48,7 @@ export class UserService {
   }
 
   async updateUser(user_id: string, user: User) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -95,7 +95,7 @@ export class UserService {
   }
 
   async deleteUser(user_id: string) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -117,7 +117,7 @@ export class UserService {
   }
 
   async softDeleteUser(user_id: string) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -154,7 +154,7 @@ export class UserService {
   }
 
   async getUserById(user_id: string) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -168,8 +168,8 @@ export class UserService {
     }
   }
 
-  async getUserByName(fullname: string) {
-    let result = (await Helpers.query(`select * from users where fullname = '${fullname}' and isDeleted = 0 and role != 'admin'`)).recordset as User[];
+  async getUserByName(fullname: Fullname) {
+    let result = (await Helpers.query(`select * from users where fullname = '${fullname.fullname}' and isDeleted = 0 and role != 'admin'`)).recordset as User[];
 
     if (lodash.isEmpty(result)) {
       return {
@@ -183,8 +183,8 @@ export class UserService {
     }
   }
 
-  async getUserByEmail(email: string) {
-    let result = (await Helpers.query(`select * from users where email = '${email}' and role != 'admin`)).recordset as User[];
+  async getUserByEmail(email: Email) {
+    let result = (await Helpers.query(`select * from users where email = '${email.email}' and role != 'admin'`)).recordset as User[];
 
     if (lodash.isEmpty(result)) {
       return {
@@ -199,7 +199,7 @@ export class UserService {
   }
 
   async retrieveDeletedUser(user_id: string) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 1`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -221,6 +221,13 @@ export class UserService {
   }
 
   async retrieveDeletedUsers() {
+    let checkUsers = (await Helpers.query('select * from users where isDeleted = 1')).recordset as User[];
+
+    if (lodash.isEmpty(checkUsers)) {
+      return {
+        error: 'There are no deleted users to be retrieved for now'
+      }
+    }
     let result = (await Helpers.query(`update users set isDeleted = 0 where isDeleted = 1`)).rowsAffected;
 
     if (result[0] < 1) {
@@ -229,7 +236,7 @@ export class UserService {
       }
     } else {
       return {
-        message: `All users is successfully restored`
+        message: `All users are successfully restored`
       }
     }
   }

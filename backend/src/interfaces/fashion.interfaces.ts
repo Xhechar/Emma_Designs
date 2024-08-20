@@ -14,7 +14,7 @@ export interface User {
   profile_image: string,
   password: string,
   role: string,
-  createdAt: string,
+  createdAt: string
 }
 
 export interface Logins {
@@ -33,6 +33,10 @@ export interface Product {
   cartegory: string,
   createdAt: string,
   type: string,
+  onOffer: boolean,
+  discount: number,
+  max_quantity: number,
+  onFlush: boolean,
   review?: Review
 }
 
@@ -117,4 +121,16 @@ export interface Name {
 
 export interface Cartegorie {
   cartegory: string
+}
+
+export interface OrderIds {
+  order_ids: string[]
+}
+
+export interface Fullname {
+  fullname: string
+}
+
+export interface Email {
+  email: string
 }

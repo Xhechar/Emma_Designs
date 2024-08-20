@@ -17,7 +17,7 @@ ALTER TABLE oders
 ADD isDeleted BIT DEFAULT 0
 
 ALTER TABLE oders
-ADD itemsCount BIT DEFAULT 1
+ADD itemsCount INT DEFAULT 0
 
 ALTER TABLE oders
-ADD pricePaid BIT DEFAULT 0
+ADD pricePaid INT DEFAULT 0

@@ -6,7 +6,7 @@ const cartService = new CartService();
 export class CartConroller {
   async createCart(req: Request, res: Response) {
     try {
-      let response = await cartService.createCart(req.params.user_id, req.body);
+      let response = await cartService.createCart(getUserIdFromToken(req), req.body);
 
       return res.status(201).json(response);
     } catch (error) {
@@ -32,7 +32,7 @@ export class CartConroller {
 
   async removeItemFromCart(req: Request, res: Response) {
     try {
-
+      
       let response = await cartService.removeItemFromCart(req.params.cart_id);
 
       return res.status(201).json(response);
@@ -47,7 +47,7 @@ export class CartConroller {
   async clearCart(req: Request, res: Response) {
     try {
 
-      let response = await cartService.clearCart(req.params.user_id);
+      let response = await cartService.clearCart(getUserIdFromToken(req));
 
       return res.status(201).json(response);
       
@@ -61,7 +61,7 @@ export class CartConroller {
   async getCartItemsByUser(req: Request, res: Response) {
     try {
 
-      let response = await cartService.getCartItemsByUser(req.params.user_id);
+      let response = await cartService.getCartItemsByUser(getUserIdFromToken(req));
 
       return res.status(201).json(response);
       

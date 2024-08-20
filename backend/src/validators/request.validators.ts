@@ -5,9 +5,11 @@ export const loginsValidator = Joi.object({
     'email': 'Please enter a valid email',
     'string.empty': 'Please enter email'
   }),
-  password: Joi.string().required().pattern(new RegExp('^[A-Za-z0-9]{8}$')).messages({
-    'password.empty': 'Password is required',
-    'password.pattern.base': 'The password should contain atleast one special character, letters and numbers, 8 characters or more.'
+  password: Joi.string().required().min(8).max(30).pattern(new RegExp('^[A-Za-z0-9]{8,30}$')).messages({
+    "password.min": "The password should contain a minimum of 8 characters",
+    "password.max": "The password should contain a max of 30 character(s)",
+    "password.required": "Please enter password",
+    "password.pattern": "Password should contain Capital, small letters and numbers"
   })
 });
 
@@ -24,7 +26,7 @@ export const userValidator = Joi.object({
   }),
   phone_number: Joi.string().required().pattern(new RegExp('^[0-9]{10}$')).messages({
     'phone_number.required': 'Please enter phone number',
-    'phone_number.pattern': 'Phone number should contain only numbers with 10 characters'
+    'phone_number.pattern.base': 'Phone number should contain only numbers with 10 characters'
   }),
   gender: Joi.string().required().max(8).messages({
     'gender.required': 'Gender is required'
@@ -32,7 +34,13 @@ export const userValidator = Joi.object({
   country: Joi.string().required(),
   county: Joi.string().required(),
   address: Joi.string().required(),
-  profile_image: Joi.string().required()
+  profile_image: Joi.string().required(),
+  password: Joi.string().required().min(8).max(30).pattern(new RegExp('^[A-Za-z0-9]{8,30}$')).messages({
+    "password.min": "The password should contain a minimum of 8 characters",
+    "password.max": "The password should contain a max of 30 character(s)",
+    "password.required": "Please enter password",
+    "password.pattern": "Password should contain Capital, small letters and numbers"
+  })
 });
 
 export const productSchema = Joi.object({
@@ -44,7 +52,7 @@ export const productSchema = Joi.object({
   images: Joi.string().required().messages({
     'images.required': 'Please enter images'
   }),
-  short_desc: Joi.string().required().max(16).messages({
+  short_desc: Joi.string().required().max(30).messages({
     'short_desc.required': 'Please enter short description',
     'short_desc.max': 'The short description field entered should have a max of 16 characters'
   }),
@@ -55,5 +63,7 @@ export const productSchema = Joi.object({
   price: Joi.number().required(),
   stock_quantity: Joi.number().required(),
   cartegory: Joi.string().required(),
-  type: Joi.string().required()
+  type: Joi.string().required(),
+  discount: Joi.number().required(),
+  max_quantity: Joi.number().required()
 });

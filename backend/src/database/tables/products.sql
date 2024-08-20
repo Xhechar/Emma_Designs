@@ -23,3 +23,6 @@ ADD discount INT DEFAULT 0
 
 ALTER TABLE products
 ADD max_quantity INT DEFAULT 0
+
+ALTER TABLE products
+ADD onFlush BIT NOT NULL DEFAULT 0

@@ -6,7 +6,7 @@ import { Helpers } from '../db_helper/db_helper';
 export class CartService {
 
   async createCart(user_id: string, purchased_product: PurchasedProduct) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -33,7 +33,7 @@ export class CartService {
   }
 
   async updateCartItem(user_id: string, cart_id: string, purchased_product: PurchasedProduct) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -41,7 +41,7 @@ export class CartService {
       }
     }
 
-    let itemExists = (await Helpers.query(`select * from cart where user_id = ${user_id} and cartid = '${cart_id}'`)).recordset as Cart[];
+    let itemExists = (await Helpers.query(`select * from cart where user_id = '${user_id}' and cart_id = '${cart_id}'`)).recordset as Cart[];
 
     if (lodash.isEmpty(itemExists)) {
       return {
@@ -85,7 +85,7 @@ export class CartService {
   }
 
   async clearCart(user_id: string) {
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -108,7 +108,7 @@ export class CartService {
 
   async getCartItemsByUser(user_id: string) {
     let cart: Cart[] = [];
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -116,7 +116,7 @@ export class CartService {
       }
     }
 
-    let result = (await Helpers.query(`select * from cart c where user_id = '${user_id}' join products p on c.product_id = p.product_id`)).recordset;
+    let result = (await Helpers.query(`SELECT c.cart_id, c.product_id as cart_product_id, c.user_id, c.isPaid, c.itemsCount, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM cart c JOIN products p ON c.product_id = p.product_id WHERE c.user_id = '${user_id}'`)).recordset;
 
     if (lodash.isEmpty(result)) {
       return {
@@ -140,7 +140,11 @@ export class CartService {
             stock_quantity: item.stock_quantity,
             cartegory: item.cartegory,
             createdAt: item.createAt,
-            type: item.type
+            type: item.type,
+            onOffer: item.onOffer,
+            discount: item.discount,
+            max_quantity: item.max_quantity,
+            onFlush: item.onFlush
           }  
         }
         cart.push(cartItem);

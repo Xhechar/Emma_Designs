@@ -1,12 +1,12 @@
 import { Helpers } from "../db_helper/db_helper";
-import { Cart, Order, Product, User } from "../interfaces/fashion.interfaces";
+import { Cart, Order, OrderIds, Product, User } from "../interfaces/fashion.interfaces";
 import lodash from 'lodash';
 import { v4 } from 'uuid';
 
 export class OrderService {
   async createOrder(user_id: string) {
     let rowsAffected = 0;
-    let userExists = (await Helpers.query(`select * from users where user_id = ${user_id} and isDeleted = 0`)).recordset as User[];
+    let userExists = (await Helpers.query(`select * from users where user_id = '${user_id}' and isDeleted = 0`)).recordset as User[];
 
     if (lodash.isEmpty(userExists)) {
       return {
@@ -14,7 +14,7 @@ export class OrderService {
       }
     }
 
-    let cartProducts = (await Helpers.query(`select c.cart_id, c.product_id as cart_product_id, c.itemsCount, c.user_id, c.isPaid, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type, p.itemsCount as product_itemsCount, p.pricePaid from cart c join products on c.product_id = p.product_id where user_id = '${user_id}' and c.isPaid = 0`)).recordset;
+    let cartProducts = (await Helpers.query(`select c.cart_id, c.product_id as cart_product_id, c.user_id, c.isPaid, c.itemsCount, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush from cart c join products p on c.product_id = p.product_id where c.user_id = '${user_id}' and c.isPaid = 0`)).recordset;
 
     if (lodash.isEmpty(cartProducts)) {
       return {
@@ -25,19 +25,23 @@ export class OrderService {
     for (let cartProduct of cartProducts) {
       let createOrder = (await Helpers.execute('createOrder', {
         order_id: v4(),
-        user_id: user_id,
-        product_id: cartProduct.product_id,
+        user_id: cartProduct.user_id,
+        product_id: cartProduct.cart_product_id,
         itemsCount: cartProduct.itemsCount,
-        pricePaid: (cartProduct.itemsCount * cartProduct.price)
+        pricePaid: (cartProduct.itemsCount * (cartProduct.price - cartProduct.discount))
       })).rowsAffected;
 
       if (createOrder[0] < 1) {
-        continue;
+        return {
+          error: 'Unable to create order'
+        };
       } else {
         let updateProduct = (await Helpers.query(`update products set stock_quantity = stock_quantity - ${cartProduct.itemsCount} where product_id = '${cartProduct.product_id}'`)).rowsAffected;
 
         if (updateProduct[0] < 1) {
-          continue;
+          return {
+            error: 'Unable to update order on products'
+          };
         }
 
         rowsAffected += 1;
@@ -91,8 +95,8 @@ export class OrderService {
     }
   }
 
-  async updateMultipleDeliveryStatus(order_ids: string[]) {
-    for (let order_id of order_ids) {
+  async updateMultipleDeliveryStatus(order_ids: OrderIds) {
+    for (let order_id of order_ids.order_ids) {
       let status = (await Helpers.query(`select * from oders o where order_id = '${order_id}' and isDeleted = 0 join products p on o.product_id = p.product_id`)).recordset;
 
       if (lodash.isEmpty(status)) {
@@ -217,7 +221,7 @@ export class OrderService {
 
   async getAllSoftDeletedOrders() {
     let retrievedOrders: Order[] = [];
-    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.itemsCount as product_itemsCount, p.pricePaid FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 1')).recordset;
+    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, o.isCanceled, o.isDeleted, o.itemsCount, o.pricePaid, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 1')).recordset;
 
     if (lodash.isEmpty(result)) {
       return {
@@ -258,7 +262,11 @@ export class OrderService {
           short_desc: record.short_desc,
           long_desc: record.long_desc,
           createdAt: record.product_createdAt,
-          type: record.type
+          type: record.type,
+          onOffer: record.onOffer,
+          discount: record.discount,
+          max_quantity: record.max_quantity,
+          onFlush: record.onFlush
         },
       }
       retrievedOrders.push(order);
@@ -273,7 +281,7 @@ export class OrderService {
 
   async getAllOrders() {
     let retrievedOrders: Order[] = [];
-    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.itemsCount as product_itemsCount, p.pricePaid FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 0')).recordset;
+    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 0')).recordset;
 
     if (lodash.isEmpty(result)) {
       return {
@@ -314,7 +322,11 @@ export class OrderService {
           short_desc: record.short_desc,
           long_desc: record.long_desc,
           createdAt: record.product_createdAt,
-          type: record.type
+          type: record.type,
+          onOffer: record.onOffer,
+          discount: record.discount,
+          max_quantity: record.max_quantity,
+          onFlush: record.onFlush
         },
       }
       retrievedOrders.push(order);
@@ -337,7 +349,7 @@ export class OrderService {
       }
     }
 
-    let result = (await Helpers.query(`SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.itemsCount as product_itemsCount, p.pricePaid FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 0 and o.user_id = '${user_id}'`)).recordset;
+    let result = (await Helpers.query(`SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, o.isCanceled, o.isDeleted, o.itemsCount, o.pricePaid, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 0 and o.user_id = '${user_id}'`)).recordset;
 
     if (lodash.isEmpty(result)) {
       return {
@@ -352,7 +364,7 @@ export class OrderService {
         order_id: record.order_id,
         createdAt: record.order_createdAt,
         delivery: record.delivery,
-        itemsCount: record.product_itemsCount,
+        itemsCount: record.itemsCount,
         pricePaid: record.pricePaid,
         user: {
           user_id: record.user_id,
@@ -378,7 +390,11 @@ export class OrderService {
           short_desc: record.short_desc,
           long_desc: record.long_desc,
           createdAt: record.product_createdAt,
-          type: record.type
+          type: record.type,
+          onOffer: record.onOffer,
+          discount: record.discount,
+          max_quantity: record.max_quantity,
+          onFlush: record.onFlush
         },
       }
       retrievedOrders.push(order);

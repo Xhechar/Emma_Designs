@@ -86,7 +86,7 @@ export class ReviewService {
 
   async getReviewsByUserId(user_id: string) {
     let reviews: Review[] = [];
-    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type from reviews r join products p on r.product_id = p.product_id where r.user_id = '${user_id}'`)).recordset;
+    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush from reviews r join products p on r.product_id = p.product_id where r.user_id = '${user_id}'`)).recordset;
 
     if (lodash.isEmpty(reviewExists)) {
       return {
@@ -114,7 +114,11 @@ export class ReviewService {
             stock_quantity: review.stock_quantity,
             cartegory: review.cartegory,
             createdAt: review.createAt,
-            type: review.type
+            type: review.type,
+            onOffer: review.onOffer,
+            discount: review.discount,
+            max_quantity: review.max_quantity,
+            onFlush: review.onFlush
           }
         });
         reviews.push(rev)
@@ -130,7 +134,7 @@ export class ReviewService {
   async getReviewsByProductId(product_id: string) {
     let totalRatingsCount: number = 0;
     let reviews: Review[] = [];
-    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type from reviews r join products p on r.product_id = p.product_id where r.product_id = '${product_id}'`)).recordset;
+    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush from reviews r join products p on r.product_id = p.product_id where r.product_id = '${product_id}'`)).recordset;
 
     if (lodash.isEmpty(reviewExists)) {
       return {
@@ -159,7 +163,11 @@ export class ReviewService {
             stock_quantity: review.stock_quantity,
             cartegory: review.cartegory,
             createdAt: review.createAt,
-            type: review.type
+            type: review.type,
+            onOffer: review.onOffer,
+            discount: review.discount,
+            max_quantity: review.max_quantity,
+            onFlush: review.onFlush
           }
         });
         reviews.push(rev)
@@ -176,7 +184,7 @@ export class ReviewService {
 
   async getAllReviews() {
     let reviews: Review[] = [];
-    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type from reviews r join products p on r.product_id = p.product_id`)).recordset;
+    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush from reviews r join products p on r.product_id = p.product_id`)).recordset;
 
     if (lodash.isEmpty(reviewExists)) {
       return {
@@ -204,7 +212,11 @@ export class ReviewService {
             stock_quantity: review.stock_quantity,
             cartegory: review.cartegory,
             createdAt: review.createAt,
-            type: review.type
+            type: review.type,
+            onOffer: review.onOffer,
+            discount: review.discount,
+            max_quantity: review.max_quantity,
+            onFlush: review.onFlush
           }
         });
         reviews.push(rev)
@@ -219,7 +231,7 @@ export class ReviewService {
 
   async getReviewsByRating(rating: string) {
     let reviews: Review[] = [];
-    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type from reviews r join products p on r.product_id = p.product_id where r.rating = '${rating}'`)).recordset;
+    let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush from reviews r join products p on r.product_id = p.product_id where r.rating = '${rating}'`)).recordset;
 
     if (lodash.isEmpty(reviewExists)) {
       return {
@@ -247,7 +259,11 @@ export class ReviewService {
             stock_quantity: review.stock_quantity,
             cartegory: review.cartegory,
             createdAt: review.createAt,
-            type: review.type
+            type: review.type,
+            onOffer: review.onOffer,
+            discount: review.discount,
+            max_quantity: review.max_quantity,
+            onFlush: review.onFlush
           }
         });
         reviews.push(rev)

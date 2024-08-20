@@ -41,7 +41,9 @@ export const verifyToken = (req: ExtendedRequest, res: Response, next: NextFunct
       next();
     })
   } catch (error) {
-    
+    return res.status(501).json({
+      error: error
+    })
   }
 }
 
@@ -54,5 +56,25 @@ export const getUserIdFromToken = (req: ExtendedRequest):string => {
     const user_id = data.user_id;
 
     return user_id;
+  }
+}
+
+export const verifyAdmin = (req: ExtendedRequest, res: Response,next: NextFunction) => {
+  const info = req.info as TokenInfo;
+
+  if (!info) {
+    return res.status(401).json({
+      error: 'You are not authorised as admin to access this service'
+    })
+  } else {
+    const role = info.role;
+
+    if (role != 'admin') {
+      return res.status(401).json({
+        error: 'You cannot access this service, contact admin'
+      })
+    } else {
+      next();
+    }
   }
 }

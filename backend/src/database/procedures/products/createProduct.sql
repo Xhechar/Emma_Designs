@@ -7,10 +7,12 @@ CREATE OR ALTER PROCEDURE createProduct (
   @price INT,
   @stock_quantity INT,
   @cartegory VARCHAR(255),
-  @type VARCHAR(255)
+  @type VARCHAR(255),
+  @discount INT,
+  @max_quantity INT
 )
 AS 
 BEGIN
-  INSERT INTO products (product_id, name, images, short_desc, long_desc, price, stock_quantity, cartegory, type) 
-  VALUES (@product_id, @name, @images, @short_desc, @long_desc, @price, @stock_quantity, @cartegory, @type)
+  INSERT INTO products (product_id, name, images, short_desc, long_desc, price, stock_quantity, cartegory, type, discount, max_quantity) 
+  VALUES (@product_id, @name, @images, @short_desc, @long_desc, @price, @stock_quantity, @cartegory, @type, @discount, @max_quantity)
 END

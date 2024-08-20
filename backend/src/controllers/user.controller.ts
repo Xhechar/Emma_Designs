@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { userValidator } from "../validators/request.validators";
 import { UserService } from "../services/user.service";
+import { getUserIdFromToken } from "../middleware/verify.token";
 
 const userService = new UserService();
 export class UserController {
@@ -37,7 +38,9 @@ export class UserController {
         })
       }
 
-      let response = await userService.updateUser(req.params.user_id, req.body);
+      console.log(getUserIdFromToken(req));
+
+      let response = await userService.updateUser(getUserIdFromToken(req), req.body);
 
       return res.status(201).json(response);
       
@@ -107,7 +110,7 @@ export class UserController {
   async getUserById(req: Request, res: Response) {
     try {
 
-      let response = await userService.getUserById(req.params.user_id);
+      let response = await userService.getUserById(getUserIdFromToken(req));
 
       return res.status(201).json(response)
       
@@ -121,7 +124,7 @@ export class UserController {
   async getUserByName(req: Request, res: Response) {
     try {
 
-      let response = await userService.getUserByName(req.params.name);
+      let response = await userService.getUserByName(req.body);
 
       return res.status(201).json(response)
       
@@ -135,7 +138,7 @@ export class UserController {
   async getUserByEmail(req: Request, res: Response) {
     try {
 
-      let response = await userService.getUserByEmail(req.params.email);
+      let response = await userService.getUserByEmail(req.body);
 
       return res.status(201).json(response)
       
@@ -150,6 +153,20 @@ export class UserController {
     try {
 
       let response = await userService.retrieveDeletedUser(req.params.user_id);
+
+      return res.status(201).json(response)
+      
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async retrieveDeletedUsers(req: Request, res: Response) {
+    try {
+
+      let response = await userService.retrieveDeletedUsers();
 
       return res.status(201).json(response)
       

@@ -70,10 +70,95 @@ export class ProductController {
     }
   }
 
+  async getProductByCartegory(req: Request, res: Response) {
+    try {
+
+      let response = await productService.getProductByCartegory(req.body);
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
   async getAllProduct(req: Request, res: Response) {
     try {
 
       let response = await productService.getAllProduct();
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async getFlushProducts(req: Request, res: Response) {
+    try {
+      let response = await productService.getFlushProducts();
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async getOfferredProducts(req: Request, res: Response) {
+    try {
+      let response = await productService.getOfferredProducts();
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async setOffer(req: Request, res: Response) {
+    try {
+      let response = await productService.setOffer(req.params.product_id);
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async removeFromOffers(req: Request, res: Response) {
+    try {
+      let response = await productService.removeFromOffers(req.params.product_id);
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async setFlushProducts(req: Request, res: Response) {
+    try {
+      let response = await productService.setFlushProducts(req.params.product_id);
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async resetFlushProducts(req: Request, res: Response) {
+    try {
+      let response = await productService.resetFlushProducts(req.params.product_id);
 
       return res.status(201).json(response);
     } catch (error) {

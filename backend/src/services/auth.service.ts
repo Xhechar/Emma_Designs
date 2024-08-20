@@ -24,7 +24,7 @@ export class AuthService {
         error: 'Incorrect password provided'
       }
     } else {
-      let token = jwt.sign(emailExists, process.env.SECRET_KEY as string, {
+      let token = jwt.sign(emailExists[0], process.env.SECRET_KEY as string, {
         expiresIn: '30m'
       });
 

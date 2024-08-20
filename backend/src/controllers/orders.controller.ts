@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { OrderService } from "../services/oders";
+import { getUserIdFromToken } from "../middleware/verify.token";
 
 const orderService = new OrderService();
 export class OrderController {
   async createOrder(req: Request, res: Response) {
     try {
-      let response = await orderService.createOrder(req.params.user_id);
+      let response = await orderService.createOrder(getUserIdFromToken(req));
 
       return res.status(201).json(response);
     } catch (error) {
