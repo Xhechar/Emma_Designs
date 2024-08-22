@@ -44,6 +44,14 @@ export class OrderService {
           };
         }
 
+        let deleteCart = (await Helpers.query(`delete from cart where cart_id = '${cartProduct.cart_id}'`)).rowsAffected;
+
+        if (deleteCart[0] < 1) {
+          return {
+            error: 'Unable to remove cart items'
+          }
+        }
+
         rowsAffected += 1;
       }
     }
@@ -96,12 +104,14 @@ export class OrderService {
   }
 
   async updateMultipleDeliveryStatus(order_ids: OrderIds) {
+    let count = 0;
+    let delivery = '';
     for (let order_id of order_ids.order_ids) {
-      let status = (await Helpers.query(`select * from oders o where order_id = '${order_id}' and isDeleted = 0 join products p on o.product_id = p.product_id`)).recordset;
+      let status = (await Helpers.query(`select * from oders o join products p on o.product_id = p.product_id where o.order_id = '${order_id}' and o.isDeleted = 0 `)).recordset;
 
       if (lodash.isEmpty(status)) {
         return {
-          error: `The order specified " ${status[0].name} " does not exist`
+          error: `The order(s) specified does not exist`
         }
       } else {
         if (status[0].delivery == 'pending') {
@@ -112,9 +122,8 @@ export class OrderService {
               error: `Unable to update order delivery status for order with name " ${status[0].name} "`
             }
           } else {
-            return {
-              message: 'Orders successfully updated to delivered'
-            }
+            count += 1;
+            delivery = 'delivered'
           }
         } else {
           let result = (await Helpers.query(`update oders set delivery = 'pending' where order_id = '${order_id}'`)).rowsAffected;
@@ -124,11 +133,21 @@ export class OrderService {
               error: `Unable to update order delivery status for order with name " ${status[0].name} "`
             }
           } else {
-            return {
-              message: 'Order successfully updated to pending'
-            }
+            count++;
+            delivery = 'pending'
           }
         }
+      }
+    }
+
+    if ((order_ids.order_ids.length) === count) {
+      return {
+        message: `Order(s) successfully updated to ${delivery}`
+      }
+    }
+    else {
+      return {
+        error: `Unable to update order(s) to ${delivery}`
       }
     }
   }
@@ -143,6 +162,20 @@ export class OrderService {
     } else {
       return {
         message: 'Order(s) successfully updated to delivered'
+      }
+    }
+  }
+
+  async resetAllDeliveryStatus() {
+    let result = (await Helpers.query(`update oders set delivery = 'pending' where delivery = 'delivered' and isDeleted = 0`)).rowsAffected;
+  
+    if (result[0] < 1) {
+      return {
+        error: 'Unable to update order delivery status'
+      }
+    } else {
+      return {
+        message: 'Order(s) successfully updated to pending'
       }
     }
   }
@@ -184,7 +217,7 @@ export class OrderService {
   }
 
   async restoreSingleOrder(order_id: string) {
-    let orderExist = (await Helpers.query(`select * from oders where order_id = '${order_id}' and isDeleted = 0`)).recordset as Order[];
+    let orderExist = (await Helpers.query(`select * from oders where order_id = '${order_id}' and isDeleted = 1`)).recordset as Order[];
 
     if (lodash.isEmpty(orderExist)) {
       return {
@@ -210,18 +243,18 @@ export class OrderService {
 
     if (result[0] < 1) {
       return {
-        error: 'Unable to delete all the orders'
+        error: 'Unable to restore the orders'
       }
     } else {
       return {
-        message: 'Order(s) successfully moved to bin'
+        message: 'Order(s) successfully restored'
       }
     }
   }
 
   async getAllSoftDeletedOrders() {
     let retrievedOrders: Order[] = [];
-    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, o.isCanceled, o.isDeleted, o.itemsCount, o.pricePaid, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 1')).recordset;
+    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, o.isCanceled, o.isDeleted, o.itemsCount, o.pricePaid, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE o.isDeleted = 1')).recordset;
 
     if (lodash.isEmpty(result)) {
       return {
@@ -279,13 +312,133 @@ export class OrderService {
 
   }
 
+  async getAllPendingOrders() {
+    let retrievedOrders: Order[] = [];
+    let result = (await Helpers.query("SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE o.isDeleted = 0 and o.delivery = 'pending'")).recordset;
+
+    if (lodash.isEmpty(result)) {
+      return {
+        error: 'No pending delivery orders currently available'
+      }
+    }
+
+    result.map(record => {
+      const order: Order = {
+        user_id: record.order_user_id,
+        product_id: record.order_product_id,
+        order_id: record.order_id,
+        createdAt: record.order_createdAt,
+        delivery: record.delivery,
+        itemsCount: record.product_itemsCount,
+        pricePaid: record.pricePaid,
+        user: {
+          user_id: record.user_id,
+          fullname: record.fullname,
+          email: record.email,
+          phone_number: record.phone_number,
+          gender: record.gender,
+          country: record.country,
+          county: record.county,
+          address: record.address,
+          profile_image: record.profile_image,
+          role: record.role,
+          password: record.password,
+          createdAt: record.createdAt
+        },
+        product: {
+          product_id: record.product_id,
+          name: record.product_name,
+          price: record.price,
+          stock_quantity: record.stock_quantity,
+          cartegory: record.cartegory,
+          images: record.images,
+          short_desc: record.short_desc,
+          long_desc: record.long_desc,
+          createdAt: record.product_createdAt,
+          type: record.type,
+          onOffer: record.onOffer,
+          discount: record.discount,
+          max_quantity: record.max_quantity,
+          onFlush: record.onFlush
+        },
+      }
+      retrievedOrders.push(order);
+    });
+
+    return {
+      message: 'Orders successfully retrieved',
+      orders: retrievedOrders
+    }
+
+  }
+
   async getAllOrders() {
     let retrievedOrders: Order[] = [];
-    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE u.isDeleted = 0')).recordset;
+    let result = (await Helpers.query('SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE o.isDeleted = 0')).recordset;
 
     if (lodash.isEmpty(result)) {
       return {
         error: 'No orders currently available'
+      }
+    }
+
+    result.map(record => {
+      const order: Order = {
+        user_id: record.order_user_id,
+        product_id: record.order_product_id,
+        order_id: record.order_id,
+        createdAt: record.order_createdAt,
+        delivery: record.delivery,
+        itemsCount: record.product_itemsCount,
+        pricePaid: record.pricePaid,
+        user: {
+          user_id: record.user_id,
+          fullname: record.fullname,
+          email: record.email,
+          phone_number: record.phone_number,
+          gender: record.gender,
+          country: record.country,
+          county: record.county,
+          address: record.address,
+          profile_image: record.profile_image,
+          role: record.role,
+          password: record.password,
+          createdAt: record.createdAt
+        },
+        product: {
+          product_id: record.product_id,
+          name: record.product_name,
+          price: record.price,
+          stock_quantity: record.stock_quantity,
+          cartegory: record.cartegory,
+          images: record.images,
+          short_desc: record.short_desc,
+          long_desc: record.long_desc,
+          createdAt: record.product_createdAt,
+          type: record.type,
+          onOffer: record.onOffer,
+          discount: record.discount,
+          max_quantity: record.max_quantity,
+          onFlush: record.onFlush
+        },
+      }
+      retrievedOrders.push(order);
+    });
+
+    return {
+      message: 'Orders successfully retrieved',
+      orders: retrievedOrders
+    }
+
+  }
+
+  async getAllDeliveredOrders() {
+    let retrievedOrders: Order[] = [];
+    let result = (await Helpers.query("SELECT o.user_id as order_user_id, o.product_id as order_product_id,  o.order_id, o.createdAt AS order_createdAt, o.delivery, u.user_id, u.fullname, u.email, u.phone_number, u.gender, u.country, u.county, u.address, u.profile_image, u.role, u.password, u.createdAt, p.product_id, p.name AS product_name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt as product_createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush FROM oders o JOIN users u ON o.user_id = u.user_id JOIN products p ON o.product_id = p.product_id WHERE o.isDeleted = 0 and o.delivery = 'delivered'")).recordset;
+
+    if (lodash.isEmpty(result)) {
+      return {
+        error: 'No delivered orders currently available'
       }
     }
 

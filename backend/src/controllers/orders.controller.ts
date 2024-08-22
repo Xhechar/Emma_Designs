@@ -52,6 +52,18 @@ export class OrderController {
     }
   }
 
+  async resetAllDeliveryStatus(req: Request, res: Response) {
+    try {
+      let response = await orderService.resetAllDeliveryStatus();
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
   async softDeleteOrder(req: Request, res: Response) {
     try {
       let response = await orderService.softDeleteOrder(req.params.order_id);
@@ -124,9 +136,33 @@ export class OrderController {
     }
   }
 
+  async getAllDeliveredOrders(req: Request, res: Response) {
+    try {
+      let response = await orderService.getAllDeliveredOrders();
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
+  async getAllPendingOrders(req: Request, res: Response) {
+    try {
+      let response = await orderService.getAllPendingOrders();
+
+      return res.status(201).json(response);
+    } catch (error) {
+      return res.status(501).json({
+        error: error
+      })
+    }
+  }
+
   async getAllOrdersByUserId(req: Request, res: Response) {
     try {
-      let response = await orderService.getAllOrdersByUserId(req.params.user_id);
+      let response = await orderService.getAllOrdersByUserId(getUserIdFromToken(req));
 
       return res.status(201).json(response);
     } catch (error) {

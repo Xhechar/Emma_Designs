@@ -4,7 +4,7 @@ CREATE TABLE reviews (
   product_id VARCHAR(255) NOT NULL,
   rating INT DEFAULT 0,
   review VARCHAR(255) NOT NULL,
-  createAt DATE DEFAULT GETDATE(),
+  createdAt DATE DEFAULT GETDATE(),
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
@@ -12,4 +12,6 @@ CREATE TABLE reviews (
 SELECT * FROM reviews
 
 ALTER TABLE reviews 
-ADD updatedAt DATE DEFAULT GETDATE()
+ADD updatedAt VARCHAR(255) DEFAULT CAST (GETDATE() as VARCHAR);
+
+DROP TABLE reviews

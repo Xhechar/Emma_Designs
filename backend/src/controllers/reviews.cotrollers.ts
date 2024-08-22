@@ -20,7 +20,7 @@ export class ReviewController {
   async updateReview(req: Request, res: Response) {
     try {
 
-      let response = await reviewService.updateReview(req.params.review_id, req.body);
+      let response = await reviewService.updateReview(getUserIdFromToken(req), req.params.review_id, req.body);
 
       return res.status(201).json(response);
     } catch (error) {

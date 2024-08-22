@@ -14,6 +14,8 @@ export class CartService {
       }
     }
 
+    console.log(purchased_product);
+
     let result = (await Helpers.execute('createCart', {
       cart_id: v4(),
       product_id: purchased_product.product_id,
@@ -132,7 +134,7 @@ export class CartService {
           itemsCount: item.itemsCount,
           product: {
             product_id: item.product_id,
-            name: item.name,
+            name: item.product_name,
             images : item.images,
             short_desc: item.short_desc,
             long_desc: item.long_desc,

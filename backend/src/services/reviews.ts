@@ -6,11 +6,27 @@ import { v4 } from 'uuid';
 export class ReviewService {
   now: Date = new Date();
   async createReview(user_id: string, product_id: string, review: Review) {
-    let userOrder = (await Helpers.query(`select * from oders where user_id = '${user_id}' and delivery = 'delivered' and product_id = ''${product_id}`)).recordset as Order[];
+    let userOrderExists = (await Helpers.query(`select * from oders where user_id = '${user_id}'`)).recordset as Order[];
+
+    if (lodash.isEmpty(userOrderExists)) {
+      return {
+        error: 'Purchase an item in order to create a review.'
+      }
+    }
+
+    let userOrder = (await Helpers.query(`select * from oders where user_id = '${user_id}' and delivery = 'delivered' and product_id = '${product_id}'`)).recordset as Order[];
 
     if (lodash.isEmpty(userOrder)) {
       return {
-        error: 'Review cannot be made until product is delivered.'
+        error: 'Product is not delivered!'
+      }
+    }
+
+    let reviewExists = (await Helpers.query(`select * from reviews where user_id = '${user_id}' and product_id = '${product_id}'`)).recordset as Review[];
+
+    if (!(lodash.isEmpty(reviewExists))) {
+      return {
+        error: 'You already created a review for this product'
       }
     }
 
@@ -33,8 +49,15 @@ export class ReviewService {
     }
   }
 
-  async updateReview(review_id: string, review: Review) {
-    let reviewExists = (await Helpers.query(`select * from reviews where review_id = '${review_id}'`)).recordset as Review[];
+  async updateReview(user_id: string, review_id: string, review: Review) {
+    let userOrderExists = (await Helpers.query(`select * from reviews where user_id = '${user_id}'`)).recordset as Order[];
+
+    if (lodash.isEmpty(userOrderExists)) {
+      return {
+        error: 'Create a review first in order to update.'
+      }
+    }
+    let reviewExists = (await Helpers.query(`select * from reviews where review_id = '${review_id}' and user_id = '${user_id}'`)).recordset as Review[];
 
     if (lodash.isEmpty(reviewExists)) {
       return {
@@ -48,7 +71,7 @@ export class ReviewService {
       product_id: reviewExists[0].product_id,
       rating: review.rating,
       review: review.review,
-      updatedAt: this.now.getTime()
+      updatedAt: new Date().toLocaleString()
     })).rowsAffected;
 
     if (updateReview[0] < 1) {
@@ -57,12 +80,13 @@ export class ReviewService {
       }
     } else {
       return {
-        message: 'Review successful'
+        message: 'Review updated successfully.'
       }
     }
   }
 
   async deleteReview(review_id: string) {
+    console.log(this.now.getDate());
     let reviewExists = (await Helpers.query(`select * from reviews where review_id = '${review_id}'`)).recordset as Review[];
 
     if (lodash.isEmpty(reviewExists)) {
@@ -132,6 +156,14 @@ export class ReviewService {
   }
 
   async getReviewsByProductId(product_id: string) {
+    let productExists = (await Helpers.query(`select * from reviews where product_id = '${product_id}'`)).recordset;
+
+    if (lodash.isEmpty(productExists)) {
+      return {
+        error: 'There are no reviews for the product required'
+      }
+    }
+    
     let totalRatingsCount: number = 0;
     let reviews: Review[] = [];
     let reviewExists = (await Helpers.query(`select r.review_id, r.user_id, r.product_id as review_product_id, r.rating, r.review, r.createdAt as review_createdAt, r.updatedAt, p.product_id, p.name, p.images, p.short_desc, p.long_desc, p.price, p.stock_quantity, p.cartegory, p.createdAt, p.type, p.onOffer, p.discount, p.max_quantity, p.onFlush from reviews r join products p on r.product_id = p.product_id where r.product_id = '${product_id}'`)).recordset;

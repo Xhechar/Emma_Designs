@@ -4,9 +4,6 @@ import { Helpers } from '../db_helper/db_helper';
 import {v4} from 'uuid';
 
 export class CartegoriesService {
-
-
-
   async createCartegory(cartegory: Cartegory) {
     let result = (await Helpers.execute('createCartegory', {
       cartegory_id: v4(),
@@ -72,8 +69,16 @@ export class CartegoriesService {
         error: 'The cartegory selected does not exist'
       }
     } else {
+
+      let deleteCartegory = (await Helpers.query(`delete from cartegories where cartegory_id  = '${cartegory_id}'`)).rowsAffected;
+
+      if (deleteCartegory[0] < 1) {
+        return {
+          error: `Unable to delete '${cartegoryExists[0].name}' cartegory`
+        }
+      }
       return {
-        message: 'Cartegory deleted successfully'
+        message: `Cartegory '${cartegoryExists[0].name}' deleted successfully`
       }
     }
   }
