@@ -1,0 +1,70 @@
+<div class="entire-contents">
+  <div class="form-holder">
+    <div class="title">
+      <h1>Bring Design To Reality</h1>
+    </div>
+
+    <form [formGroup]="newProductForm" (ngSubmit)="createProduct()">
+      <div class="left-side">
+
+        <label for="name">Name</label>
+        <input type="text" placeholder="add product name" formControlName="name" required>
+
+        <label for="cartegory">Product Cartegory</label>
+        <select name="cartegory" formControlName="cartegory" required>
+          <option value="dresses">Dresses</option>
+        </select>
+
+        <label for="type">Type Quality</label>
+        <select name="type" formControlName="type" required>
+          <option value="type" selected>New</option>
+          <option value="used">Refurbished</option>
+        </select>
+        
+        <label for="short_desc">Short Description</label>
+        <textarea class="short_desc" name="short_desc" formControlName="short_desc" required placeholder="enter product short description"></textarea>
+        
+        <label for="long_desc">Long Description</label>
+        <textarea class="long_desc" name="long_desc" formControlName="long_desc" required placeholder="enter product long description"></textarea>
+
+      </div>
+      <div class="right-side">
+
+        <div class="images">
+          <div class="imputs">
+            <label for="images">Product Images</label>
+            <input type="file" formControlName="images" required (change)="getImageUrls($event)">
+          </div>
+
+          <div class="display-image">
+            <img src="../../../fashion/trial3.jpg" alt="">
+          </div>
+        </div>
+        <div class="prices">
+          <div class="divs">
+            <label for="price">Product Price</label>
+            <input type="number" formControlName="price" placeholder="0.00" required>
+          </div>
+          <div class="divs">
+            <label for="discount">Discount To Product</label>
+            <input type="number" required formControlName="discount" placeholder="0.00" name="discount">
+          </div>
+        
+        </div>
+        <div class="prices">
+          <div class="divs">
+            <label for="stock_quantity">Stock Quantity</label>
+            <input type="number" formControlName="stock_quantity" placeholder="0.00" required>
+          </div>
+          <div class="divs">
+            <label for="max_quantity">Maximum Quantity</label>
+            <input type="number" formControlName="max_quantity" placeholder="0.00" required>
+          </div>
+  
+        </div>
+        <button type="submit">Cancel</button>
+        <button type="submit">Create New</button>
+      </div>
+    </form>
+  </div>
+</div>

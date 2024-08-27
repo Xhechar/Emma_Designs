@@ -25,6 +25,8 @@ import { AllreviewsComponent } from './components/admin/allreviews/allreviews.co
 import { PendingOrdersComponent } from './components/admin/pending-orders/pending-orders.component';
 import { DeliveredOrdersComponent } from './components/admin/delivered-orders/delivered-orders.component';
 import { CartegoriesComponent } from './components/admin/cartegories/cartegories.component';
+import { UserreviewsComponent } from './components/admin/userreviews/userreviews.component';
+import { NewproductComponent } from './components/newproduct/newproduct.component';
 
 export const routes: Routes = [
 
@@ -49,7 +51,7 @@ export const routes: Routes = [
       { path: 'deleted-orders', component: RecoverOrdersComponent },
       { path: 'users', component: UsersComponent },
       { path: 'deleted-users', component: RestoreComponent },
-      { path: 'user-reviews', component: MainComponent },
+      { path: 'user-reviews', component: UserreviewsComponent },
       { path: 'a-profile', component: AdminprofileComponent },
       { path: 'all-orders', component: AllordersComponent },
       { path: 'all-reviews', component: AllreviewsComponent },
@@ -60,5 +62,7 @@ export const routes: Routes = [
   },
   { path: 'login', component: LoginComponent },
   { path: 'sign-up', component: SignupComponent },
-  {path: '**', component: NotfoundComponent}
+  { path: 'new-product', component: NewproductComponent },
+  { path: 'bubbles', component: MainComponent },
+  { path: '**', component: NotfoundComponent }
 ];

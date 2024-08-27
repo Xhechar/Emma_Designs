@@ -1,1 +1,56 @@
-<p>login works!</p>
+<div class="notification" *ngIf="successMsg" [style]="display">
+  <p>{{successMsg}}</p>
+  <img src="../../../icons/backspace_20dp_C60606.png" alt="">
+</div>
+<div class="notification" *ngIf="errorMsg" [style]="display">
+  <p>{{errorMsg}}</p>
+  <img src="../../../icons/backspace_20dp_C60606.png" alt="">
+</div>
+<div class="entire-background">
+  <div class="middle-holder">
+    <img src="../../../icons/house_20dp_FDB2B2.png" alt="" class="img" routerLink="/home">
+    <div class="image-holder">
+      <div class="dark-background"></div>
+    </div>
+    <div class="form-holder">
+      <div class="middle-contents">
+        <div class="header">
+          <h2>
+            Welcome, We've got you...
+          </h2>
+        </div>
+        <div class="login">
+          <h3>
+            Login
+          </h3>
+        </div>
+        <form #loginUser="ngForm" (ngSubmit)="login(loginUser.value)">
+          <label for="email">Email</label>
+          <input type="email" name="email" #email="ngModel" ngModel email required>
+          <div class="err" *ngIf="email.invalid && (email.touched || email.dirty)">
+            <div class="err" *ngIf="email.hasError('required')">
+              <p>please enter email</p>
+            </div>
+            <div class="err" *ngIf="email.hasError('email')">
+              <p>email is invalid</p>
+            </div>
+          </div>
+
+          <label for="password">Password</label>
+          <input type="password" #password="ngModel" ngModel required minlength="8" name="password"/>
+          <div class="err" *ngIf="password.invalid && (password.touched || password.dirty)">
+            <div class="err" *ngIf="password.hasError('required')">
+              <p>please enter password</p>
+            </div>
+            <div class="err" *ngIf="password.hasError('minlength')">
+              <p>password should be 8 characters or more</p>
+            </div>
+          </div>
+
+          <div class="btn"><button type="submit" class="submit">Login</button></div>
+          <p>Don't Have an account? <span routerLink="/sign-up">Sign up.</span></p>
+        </form>
+      </div>
+    </div>  
+  </div>
+</div>

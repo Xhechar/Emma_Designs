@@ -1,0 +1,172 @@
+.notification {
+  width: 40vw;
+  height: 7vh;
+  background-color: rgb(225, 117, 117);
+  position: fixed;
+  top: 2vh;
+  right: 5vw;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: green;
+  font-size: small;
+}
+
+.notification > img {
+  width: 20px;
+  position: absolute;
+  right: 5%;
+}
+
+.notification > img:hover {
+  cursor: pointer;
+}
+
+span {
+  color: rgb(6, 63, 197);
+  font-size: small;
+}
+
+.entire-background {
+  width: 100%;
+  height: 100vh;
+  background-color: rgb(254, 211, 209);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.middle-holder {
+  width: 60%;
+  height: 70%;
+  background-color: #fff;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.img {
+  position: absolute;
+  right: 1%;
+  width: 45px;
+}
+
+.img:hover {
+  cursor: pointer;
+}
+
+.image-holder {
+  width: 100%;
+  height: 100%;
+  background-image: url(../../../../public/fashion/four.webp);
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.dark-background {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.form-holder {
+  border-bottom-right-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.middle-contents {
+  height: 80%;
+  width: 100%;
+}
+
+.header, .login {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.header {
+  height: 10%;
+}
+
+.login {
+  height: 10%;
+  text-align: center;
+  justify-content: center;
+}
+
+form {
+  margin-top: 8%;
+  width: 100%;
+  height: 75%;
+}
+
+form > input {
+  display: block;
+  margin-top: 2%;
+  width: 95%;
+  height: 15%;
+  border: none;
+  border-bottom: 1px dotted rgb(230, 122, 127);
+  padding-left: 5%;
+  border-radius: 10px;
+  box-shadow: 0 0 3px rgb(230, 122, 127);
+}
+
+form > input::placeholder {
+  color: rgb(131, 130, 130);
+}
+
+form > label {
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.submit {
+  border-radius: 4px;
+  height: 95%;
+  width: 60%;
+}
+
+.submit:active {
+  background-color: rgb(213, 120, 125);
+}
+
+.btn {
+  margin-top: 5%;
+  margin-bottom: 2%;
+  width: 100%;
+  height: 18%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.err {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  color: rgb(198, 19, 19);
+  font-size: small;
+}
+
+.err p {
+  margin-left: 20px;
+}
+
+span:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}

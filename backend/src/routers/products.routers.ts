@@ -10,7 +10,7 @@ productRouter.post('/update-product/:product_id', verifyToken, verifyAdmin, prod
 productRouter.get('/get-product-by-id/:product_id', verifyToken, verifyAdmin, productController.getProductByProductId);
 productRouter.get('/get-product-by-name', verifyToken, verifyAdmin, productController.getProductByName);
 productRouter.get('/get-product-by-cartegory', verifyToken, verifyAdmin, productController.getProductByCartegory);
-productRouter.get('/get-all-products', verifyToken, productController.getAllProduct);
+productRouter.get('/get-all-products', productController.getAllProduct);
 productRouter.get('/get-flush-products', verifyToken, verifyAdmin, productController.getFlushProducts);
 productRouter.get('/get-offered-products', verifyToken, verifyAdmin, productController.getOfferredProducts);
 productRouter.put('/set-offer-to-product/:product_id', verifyToken, verifyAdmin, productController.setOffer);

@@ -1,0 +1,53 @@
+.entire-contents {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.entire-contents div {
+  background-color: rgb(254, 211, 209);
+  width: 10vw;
+  height: 10vw;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.one {
+  top: 30vh;
+}
+
+.two {
+  bottom: 0;
+  left: 15vw;
+}
+
+.three {
+  top: 20vh;
+  left: 30vw;
+}
+
+.four {
+  right: 0;
+  top: 35vh;
+}
+
+.five {
+  bottom: 0;
+  right: 25vw;
+}
+
+.six {
+  top: 10vh;
+  right: 30vw;
+}
+
+.seven {
+  top: 60vh;
+  left: 40vw;
+}
+
+.eight {
+  top: 45vh;
+  left: 15vw;
+}

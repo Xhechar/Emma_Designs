@@ -9,3 +9,15 @@
 body {
   line-height: 1.6;
 }
+
+p {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: rgb(230, 122, 127);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
